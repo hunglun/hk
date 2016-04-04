@@ -1,0 +1,6 @@
+[2016-04-04 Mon]
+http://yannesposito.com/Scratch/en/blog/Haskell-the-Hard-Way/
+create program according to naming convention [0-9][0-9]_filename.hs, as I work through the above reference.
+
+It serves as a refresher of the first part of "Learn You Haskell...".
+
