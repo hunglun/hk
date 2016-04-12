@@ -11,7 +11,7 @@ toNum x = read x :: Float
 
 main = do
   putStrLn "Computing the mean of the user defined numbers."
-  interact  $ (  show .  map fst . scanl mean (0,0)  . map toNum . lines)
+  interact  $ (  unlines .  map (("> "++)  . show . fst) . scanl mean (0,0)  . map toNum . lines)
 
 
 
