@@ -6,8 +6,8 @@ mean :: Fractional a => (a,a) -> a -> (a,a)
 mean (mean, count) input  = (((mean * count + input) / newCount), newCount)
   where newCount = count + 1
 
-toNum :: String -> Float
-toNum x = read x :: Float
+toNum :: (Fractional a, Read a) => String -> a
+toNum x = read x 
 
 main = do
   putStrLn "Computing the mean of the user defined numbers."
