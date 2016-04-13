@@ -6,12 +6,9 @@ mean :: Fractional a => (a,a) -> a -> (a,a)
 mean (mean, count) input  = (((mean * count + input) / newCount), newCount)
   where newCount = count + 1
 
-toNum :: String -> Float
-toNum x = read x :: Float
-
 main = do
   putStrLn "Computing the mean of the user defined numbers."
-  interact  $ (  unlines .  map (("> "++)  . show . fst) . scanl mean (0,0)  . map toNum . lines)
+  interact  $ (  unlines .  map (("> "++)  . show . fst) . scanl mean (0,0)  . map read . lines)
 
 
 
