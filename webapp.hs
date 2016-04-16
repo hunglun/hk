@@ -1,30 +1,14 @@
-{-# LANGUAGE TypeFamilies, QuasiQuotes, MultiParamTypeClasses,
-             TemplateHaskell, OverloadedStrings #-}
-import Yesod
+{-# LANGUAGE OverloadedStrings #-}
+import           Network.HTTP.Types       (status200)
+import           Network.Wai              (Application, responseLBS)
+import           Network.Wai.Handler.Warp (run)
 
-data MyWebSite = MyWebSite
+-- http://www.yesodweb.com/book/yesod-for-haskellers
+main :: IO ()
+main = run 3000 app
 
-instance Yesod MyWebSite
-
-mkYesod "MyWebSite" [parseRoutes|
-  / HomeR GET
-|]
-
--- show
-getHomeR = defaultLayout $ do
-  [whamlet|
-    <h2> Things To Do
-    <ul>
-      <li> Learn Haskell
-      <li> Write a killer app
-      <li> Create a startup
-      <li> Go public
-  |]
-  toWidget [cassius|
-    body
-      background-color: #edf
-  |]
--- /show
--- how to set PORT in environment?
--- main = warpEnv MyWebSite
-main = warpDebug 3000 MyWebSite 
+app :: Application
+app _req sendResponse = sendResponse $ responseLBS
+    status200
+    [("Content-Type", "text/plain")]
+    "Hello Warp!"
