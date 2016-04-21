@@ -13,7 +13,10 @@ main = do
   -- c:/Users/ao1/bcserver>fsutil volume diskfree b:
   -- Total # of free bytes        : 202043080704
   line <- getLine
-  print $ freeByte line
+  let freeBytes = freeByte line
+  let emailBody = "\"B Drive free storage capacity too low: " ++ show freeBytes ++ "\""
+  print freeBytes
+
   if (storageCapacityTooLow . freeByte) line
-  then createProcess (shell "c:/Python27/Lib/site-packages/rac/ramail.py ao1 \"B Drive free storage capacity too low! \"" )
+  then createProcess (shell $"c:/Python27/Lib/site-packages/rac/ramail.py ao1 " ++ emailBody )
   else createProcess (shell "rem" )
