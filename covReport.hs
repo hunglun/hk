@@ -8,7 +8,7 @@ import System.FilePath
 import Data.List.Split
 import Text.Regex.Posix
 import System.Environment
-import Data.List (nub,sort)
+import Data.List (nub,sort,intercalate)
 import StringUtils (strip)
 import FindFiles (simpleFind)
 -- python unit test 
@@ -26,7 +26,7 @@ funcUnderTestAut s
     | otherwise = ""
  where pattern1 = "exe .+"
        match1 = (s =~ pattern1 :: String)
-       pattern2 = "{{([_a-zA-Z]+)}}"
+       pattern2 = "{{([_:0-9a-zA-Z]+)}}"
        match2 = (s =~ pattern2 :: String)
        funcSymbolList = (['_','.'] ++ ['a'..'z'] ++ ['A'..'Z'] ++['0'..'9'])
 
@@ -43,10 +43,11 @@ main = do
     ".aut" ->  return $(nub . sort . filter (/="") . map funcUnderTestAut . lines) c
     _ -> return []
 
-  let commands = ["c:\\Users\\ao1\\Documents\\work\\coverageXmlParser\\t.py " ++  covFile ++ " " ++ f | covFile <- coverageFiles, f <-fList]
+  let commands = ["c:\\Users\\ao1\\Documents\\work\\coverageXmlParser\\t.py " ++  covFile ++ " " ++ f |  f <-fList,covFile <- coverageFiles]
   mapM (\cmd -> do
+--        print cmd
         result <- readCreateProcess (shell cmd) ""
-        if result /= ""
-        then print ((reverse . drop 1 . splitOn " ") cmd ++ (drop 1 . lines) result)
+        if result /= "" 
+        then putStrLn $intercalate "," (( reverse . drop 1 . splitOn " ") cmd ++ (drop 1 . lines) result)
         else putStr ""
        ) commands
