@@ -45,9 +45,8 @@ main = do
 
   let commands = ["c:\\Users\\ao1\\Documents\\work\\coverageXmlParser\\t.py " ++  covFile ++ " " ++ f |  f <-fList,covFile <- coverageFiles]
   mapM (\cmd -> do
---        print cmd
         result <- readCreateProcess (shell cmd) ""
-        if result /= "" 
-        then putStrLn $intercalate "," (( reverse . drop 1 . splitOn " ") cmd ++ (drop 1 . lines) result)
-        else putStr ""
+        let f = \res -> intercalate "," (( reverse . drop 1 . splitOn " ") cmd ++ (drop 1) res)
+        mapM putStrLn $(map f . chunksOf 4 . lines) result
+
        ) commands
