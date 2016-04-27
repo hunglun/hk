@@ -2,7 +2,8 @@
 -- B:\jenkins\workspace\UT_SafetyL7xSJob\v\LogixTests\Safety\UnitTests>runghc -ic:\Users\ao1\code\hk c:\Users\ao1\code\hk\covReport.hs saPart.py _saPart_py
 
 -- create coverage.xml
--- C:\snapshot\ice1_main_dev\LogixTests\Safety\UnitTests>xfind _saPart_py -name "*.coverage" |xargs -I zzz "C:\Users\ao1\Documents\Visual Studio 2010\Projects\ConsoleApplication1\ConsoleApplication1\bin\Debug\ConsoleApplication1.exe" zzz zzz.xml
+-- C:\snapshot\ice1_main_dev\LogixTests\Safety\UnitTests>xfind _saPart_py -name "*.coverage" |xargs -I zzz "C:\Users\ao1\code\cSharp\coverage2xml\bin\Release\coverage2xml.exe" zzz zzz.xml
+
 import System.Process
 import System.FilePath
 import Data.List.Split
@@ -43,7 +44,7 @@ main = do
     ".aut" ->  return $(nub . sort . filter (/="") . map funcUnderTestAut . lines) c
     _ -> return []
 
-  let commands = ["c:\\Users\\ao1\\Documents\\work\\coverageXmlParser\\t.py " ++  covFile ++ " " ++ f |  f <-fList,covFile <- coverageFiles]
+  let commands = ["C:\\Users\\ao1\\code\\python\\coverageXmlParser.py " ++  covFile ++ " " ++ f |  f <-fList,covFile <- coverageFiles]
   mapM (\cmd -> do
         result <- readCreateProcess (shell cmd) ""
         let f = \res -> intercalate "," (( reverse . drop 1 . splitOn " ") cmd ++ (drop 1) res)
