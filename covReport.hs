@@ -47,7 +47,8 @@ main = do
   let commands = ["C:\\Users\\ao1\\code\\python\\coverageXmlParser.py " ++  covFile ++ " " ++ f |  f <-fList,covFile <- coverageFiles]
   mapM (\cmd -> do
         result <- readCreateProcess (shell cmd) ""
-        let f = \res -> intercalate "," (( reverse . drop 1 . splitOn " ") cmd ++ (drop 1) res)
-        mapM putStrLn $(map f . chunksOf 4 . lines) result
+        let covFile = (!! 1) $ splitOn " " cmd
+        let f = \(i,res) -> intercalate "," ( ((res !! 0) ++ (replicate i '@')) : (drop 1 res)  ++ [covFile])
+        mapM putStrLn $(map f . zip [0..] . chunksOf 4 . lines) result
 
        ) commands
