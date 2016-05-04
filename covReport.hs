@@ -48,7 +48,7 @@ main = do
   mapM (\cmd -> do
         result <- readCreateProcess (shell cmd) ""
         let covFile = (!! 1) $ splitOn " " cmd
-        let f = \(i,res) -> intercalate "," ( ((res !! 0) ++ (replicate i '@')) : (drop 1 res)  ++ [covFile])
-        mapM putStrLn $(map f . zip [0..] . chunksOf 4 . lines) result
+        let f = \res -> intercalate "$" ( res ++ [covFile])
+        mapM putStrLn $(map f . chunksOf 6 . lines) result
 
        ) commands
