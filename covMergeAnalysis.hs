@@ -4,7 +4,7 @@ import Data.List (groupBy, sortBy)
 data Funcinfolist = Funcinfolist { funcName :: String
                                  , lineCount :: Int
                                  , coverageInfoList ::[(Int,Int)]
-                                 , xmlFile :: String} deriving (Show,Read)
+                                 , xmlFile :: FilePath} deriving (Show,Read)
 compareFuncBody :: Int -> [Int] -> [Int] -> Bool
 compareFuncBody diff a b = all (\x-> fst x - diff == snd x) $zip a b
 
