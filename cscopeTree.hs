@@ -1,4 +1,3 @@
-
 import Data.Tree
 import System.Process
 import System.Environment
@@ -15,6 +14,10 @@ removeDup [] = []
 removeDup [x] = [x]
 removeDup (x:y:xs) = if fst x == fst y then (removeDup (x:xs)) else x:(removeDup (y:xs))
 
+-- output symbolName relationship in dot format
+dotOutput :: SymbolName -> [SymbolName] -> [String]
+dotOutput s cs = map (\x -> s ++ " -> " ++ x ++ ";") cs
+                       
 f :: ScopeInfo -> IO (ScopeInfo, [ScopeInfo])
 f s = do
   c <- readCreateProcess (shell ("cscope -dL0 " ++ (symbolName s))) ""
@@ -22,9 +25,9 @@ f s = do
   let fpath = ((!! 0) . (!! 0) . filter  (\x -> x!!1 == symbolName s) . map (splitOn " ")  ) results
   let callers = filter (\x -> x!!1 `notElem` [symbolName s,"<global>","defined"]) $map ( splitOn " ") results
   let callersUniq = removeDup $map (\x-> (x!!1,x!!0)) callers
-  print [symbolName s,index s]
-  print (map fst callersUniq)
-  print "-------------------------------------------------------------"
+--  print [symbolName s,index s]
+--  print (symbolName s, map fst callersUniq)
+  mapM putStrLn (dotOutput (symbolName s) (map fst callersUniq))
   if (length $index s) < 3 then 
       return (ScopeInfo (symbolName s) fpath (index s) , map (\((x,y),z) -> ScopeInfo  x y ((index s)++(show z)) ) (zip callersUniq [1..] ))             
   else
@@ -41,5 +44,10 @@ ioUnfoldForest f bs = sequence $map (ioUnfoldTree f) bs
 
 main = do
   args <- getArgs
+  putStrLn ("digraph " ++ (args!!0) ++ " { ")
+
   result <- ioUnfoldTree f (ScopeInfo (args!!0) "" "0")
-  print ""
+  
+  putStrLn "}"
+
+  return ""
