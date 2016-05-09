@@ -24,12 +24,24 @@ compareInfoList a b
     where  listA = map fst $coverageInfoList a
            listB = map fst $coverageInfoList b
 
+data Outcome = CompleteCoverage | IncompleteCoverage | UnusedFunction | HardwareException | NoTestRequired deriving (Show,Eq,Ord)
+eval :: Funcinfolist -> Outcome
+eval a
+    | allLinesCovered a == True = CompleteCoverage
+    | allLinesUncovered a == True = UnusedFunction
+    | otherwise = IncompleteCoverage
+                  
+allLinesCovered :: Funcinfolist -> Bool
+allLinesCovered a = all (\x -> snd x == 0 ) (coverageInfoList a)
 
-allLinesCovered :: Funcinfolist -> (Funcinfolist,Bool)
-allLinesCovered a = (a,all (\x -> snd x == 0 ) (coverageInfoList a))
+allLinesUncovered :: Funcinfolist -> Bool
+allLinesUncovered a = all (\x -> snd x == 2 ) (coverageInfoList a)
+
+--hardwareException :: FilePath -> Int -> Bool
 
 main = do
   c <- getContents
   let funcInfoLists = ((map $splitOn "$") . lines ) c
-  let result = map allLinesCovered $map (foldl1 merge) $groupBy compareInfoList  (map (\x -> Funcinfolist  (x!!0) (read (x!!1)) (read (x!!5)) (x!!6) ) funcInfoLists)
-  mapM print  $filter (\x-> snd x == False ) result
+  let result = map (\x-> (x,eval x)) $map (foldl1 merge) $groupBy compareInfoList  (map (\x -> Funcinfolist  (x!!0) (read (x!!1)) (read (x!!5)) (x!!6) ) funcInfoLists)
+  mapM print $sortBy (\x y-> if (snd x) > (snd y) then GT else LT ) $map (\(x,y)->(funcName x,y)) result
+
