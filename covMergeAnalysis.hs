@@ -1,6 +1,7 @@
 -- TODO : print out partially covered line and its xml file for furthur checking.
 import System.FilePath (takeDirectory,splitPath)
 import Data.List.Split (splitOn)
+import System.Directory (doesFileExist)
 import Data.List (groupBy, sortBy, isInfixOf)
 data Funcinfolist = Funcinfolist { funcName :: String
                                  , lineCount :: Int
@@ -45,8 +46,14 @@ allLinesUncovered :: Funcinfolist -> Bool
 allLinesUncovered a = all (\x -> snd x >= 2 && snd x < 1000 ) (coverageInfoList a)
 
 readSrcLine :: FilePath -> Int -> IO String
-readSrcLine path lineNum = do
-  c <- readFile path
+readSrcLine xmlFile lineNum = do
+  let f1 = (takeDirectory  xmlFile) ++ "/_cases.cpp"
+  let f2 = (takeDirectory  xmlFile) ++ "/_cases.c"      
+  let f3 = (takeDirectory  xmlFile) ++ "/unitTest.cpp" 
+  let f4 = (takeDirectory  xmlFile) ++ "/unitTest.c"
+  existence <- mapM doesFileExist [f1,f2,f3,f4]
+  let sourceFile = fst $head $filter (\x -> snd x == True) $zip [f1,f2,f3,f4] existence
+  c <- readFile sourceFile
   let line = (lines c) !! (lineNum - 1)
   return line
 
@@ -56,10 +63,8 @@ allHardwareException :: [(Int,Int)]-> [(Int,String)]  -> Bool
 allHardwareException b a = all (==True) $map (\(lineNum,s)-> ((covResult lineNum > 1000||covResult lineNum==1) && (hardwareException s)) || covResult lineNum == 0 ) a
                            where covResult lineNum=snd $head $filter (\x-> fst x==lineNum) b
 generateSourceCode :: Funcinfolist -> IO [String]
-generateSourceCode a = sequence $map (\(l,r) -> readSrcLine path l) (coverageInfoList a)
-      where autpath = (takeDirectory $xmlFile a) ++ "/_cases.cpp" -- if it is aut file
-            pypath = (takeDirectory $xmlFile a) ++ "/unitTest.c" -- if it is python file
-            path = if "_aut\\" `isInfixOf` ((!!0) $splitPath $xmlFile a) then autpath else pypath
+generateSourceCode a = sequence $map (\(l,r) -> readSrcLine (xmlFile a) l) (coverageInfoList a)
+
 updateFuncInfoList :: [[String]] -> [Funcinfolist] -> [Funcinfolist]
 updateFuncInfoList a b = zipWith (\x y -> updateFuncInfoListHelper x y) a b 
 
